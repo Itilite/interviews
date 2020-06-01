@@ -1,0 +1,105 @@
+<link href="/resources/css/classroom.css" rel="stylesheet" type="text/css">
+<section id="classrooms">
+	{% if not msg == None %}
+	<div>
+		{{msg}}
+	</div>
+	{% endif %}
+
+	<div class="classroom-options">
+	  {% if classrooms|length > 0 %}
+			<form method="get" action="/classroom">
+				<div class="mdl-textfield mdl-js-textfield getmdl-select">
+					<input type="text" value="" class="mdl-textfield__input" id="id" readonly>
+					<input type="hidden" name="id" value="">
+					<i class="mdl-icon-toggle__label material-icons">
+						keyboard_arrow_down
+					</i>
+					<label for="id" class="mdl-textfield__label">
+						Select a class...
+					</label>
+					<ul for="id" class="mdl-menu mdl-menu--bottom-left mdl-js-menu">
+						{% for classroom_select in classrooms %}
+							<li class="mdl-menu__item"
+									data-val="{{ classroom_select.key.urlsafe() }}">
+									{{ classroom_select.name }}
+							</li>
+						{% endfor %}
+					</ul>
+				</div>
+				<button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
+					Go!
+				</button>
+		  </form>
+		{% endif %}
+
+		<form method="post" action="/classroom">
+			<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+				<input id="newClassroomName" class="mdl-textfield__input"
+						   name="name" type="text">
+				<label class="mdl-textfield__label" for="newClassroomName">
+					Add a new class...
+				</label>
+			</div>
+			<button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
+				Create
+			</button>
+	  </form>
+	</div>
+
+	{% if classroom %}
+		<p id="classroom-id" hidden>{{ classroom.key.urlsafe() }}</p>
+		<div class="classroom-heading">
+			<h1>Class {{ classroom.name }}</h1>
+			<a href="/seating?classroom={{ classroom.key.urlsafe() }}"
+				 class="mdl-button mdl-js-button mdl-button--accent">
+				Generate Seating
+			</a>
+			<a href="/allseating?classroom={{ classroom.key.urlsafe() }}"
+				 class="mdl-button mdl-js-button mdl-button--accent">
+				See All Saved Seating Arrangements
+			</a>
+		</div>
+		<h2>Students</h2>
+		<section id="students">
+			{% if students|length > 0 %}
+				{% for student in students %}
+					<div class="student">
+						<p class="student-name name">{{ student.name }}</p>
+						<p class="student-id" hidden>{{ student.key.urlsafe() }}</p>
+						<p class="expander"></p>
+						<button class="delete-button mdl-button mdl-js-button mdl-js-ripple-effect">
+							<i class="material-icons">delete</i>
+						</button>
+					</div>
+				{% endfor %}
+			{% else %}
+				<p>No students found!</p>
+			{% endif %}
+		</section>
+
+		<form>
+			<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+				<input id="studentName" class="mdl-textfield__input" type="text">
+				<label class="mdl-textfield__label" for="studentName">
+					Add a student...
+				</label>
+			</div>
+			<button id="addStudent" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
+				Submit
+			</button>
+		</form>
+
+		<form method="post" action="/classroom">
+			<input type="hidden" name="_method" value="delete">
+			<input type="hidden" name="id" value="{{ classroom.key.urlsafe() }}">
+			<button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">
+				Delete {{ classroom.name }}
+			</button>
+		</form>
+	{% endif %}
+	<script src='/resources/scripts/students.js'></script>
+	<script>
+		document.addEventListener('DOMContentLoaded', Student.main, false);
+	</script>
+</section>

@@ -1,0 +1,157 @@
+<link href="/resources/css/dragula.min.css" rel="stylesheet" type="text/css">
+<link href="/resources/css/seating.css" rel="stylesheet" type="text/css">
+<link href="/resources/css/seating_single_room.css" rel="stylesheet" type="text/css">
+<div class="page-content">
+	{% if not msg == None %}
+	<div>
+		{{msg}}
+	</div>
+	{% endif %}
+
+	{% if classrooms|length > 0 %}
+		<form method="get" action="/seating">
+			<div class="mdl-textfield mdl-js-textfield getmdl-select">
+				<input type="text" value="" class="mdl-textfield__input" id="classroom" readonly>
+				<input type="hidden" name="classroom" value="">
+				<i class="mdl-icon-toggle__label material-icons">
+					keyboard_arrow_down
+				</i>
+				<label for="classroom" class="mdl-textfield__label">
+					Select a class...
+				</label>
+				<ul for="classroom" class="mdl-menu mdl-menu--bottom-left mdl-js-menu">
+					{% for classroom_select in classrooms %}
+						<li class="mdl-menu__item"
+								data-val="{{ classroom_select.key.urlsafe() }}">
+								{{ classroom_select.name }}
+						</li>
+					{% endfor %}
+				</ul>
+			</div>
+			<button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
+				Go!
+			</button>
+	  </form>
+	{% else %}
+		<div>You must create a classroom before you can set up seating!</div>
+	{% endif %}
+
+	{% if classroom and num_students > 0 %}
+		<h1>Generate Seating</h1>
+
+		<section class="seating-main">
+			<div class="classroom-options">
+				<h2 class="classroom-name">
+					{{ classroom.name }}
+					{% if day and is_saved %}
+						: Day {{ day }}
+					{% endif %}
+				</h2>
+				<a href="/classroom?id={{ classroom.key.urlsafe() }}"
+					 class="mdl-button mdl-js-button mdl-button--accent">
+					 Manage Class
+				</a>
+
+				<a href="/allseating?classroom={{ classroom.key.urlsafe() }}"
+				   class="mdl-button mdl-js-button mdl-button--accent">
+					View all saved seating arrangements
+				</a>
+			</div>
+
+		<div class="seating">
+				<div>
+					<section id="room" class="room">
+						{% for table in students_by_table %}
+							<div class="table">
+								{% for student in table %}
+									{% if student %}
+										<div class="student" id="{{ student.key.urlsafe() }}">
+											<span class="student-name">{{ student.name }}</span>
+										</div>
+									{% else %}
+										<div class="student empty"></div>
+									{% endif %}
+								{% endfor %}
+							</div>
+						{% endfor %}
+					</section>
+				</div>
+
+				<div class="seating-options">
+					{% if not is_saved %}
+						<form class="seating-layout mdl-textfield mdl-js-textfield mdl-textfield--floating-label getmdl-select">
+							<input type="text" value=""
+										 class="table-size-select mdl-textfield__input"
+										 id="table_size" readonly>
+			        <input type="hidden" value="" name="table_size">
+							<label for="table_size" class="mdl-textfield__label">
+								Table Size
+							</label>
+							<ul for="table_size" class="mdl-menu mdl-menu--bottom-left mdl-js-menu">
+								{% set max_size = ([7, (num_students / 2)|int + 1]|sort)[-1] %}
+								{% for i in range(2, max_size, 2) %}
+									{% if i == default_table_size %}
+										<li class="mdl-menu__item"
+												data-val="{{i}}"
+												data-selected="true">
+												{{i}}
+										</li>
+									{% else %}
+										<li class="mdl-menu__item" data-val="{{i}}">{{i}}</li>
+									{% endif %}
+								{% endfor %}
+							</ul>
+						</form>
+					{% else %}
+						<form action="/deleteseating" method="post">
+							<input type="hidden" name="arrangement"
+										 value="{{arrangement_key}}">
+						  <input type="hidden" name="redirect_to" value="seating">
+							<input type="hidden" name="table_size"
+							       value="{{default_table_size}}">
+							<button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--primary">
+								 Delete This Arrangement
+							</button>
+						</form>
+					{% endif %}
+
+					<form method="get" action="/seating">
+						<input type="hidden" name="classroom"
+									 value="{{classroom.key.urlsafe()}}">
+						<!-- table_size value gets reset on table-size-select change -->
+						<input type="hidden" name="table_size"
+									 value="{{default_table_size}}">
+						<button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">
+							Regenerate Seating
+						</button>
+					</form>
+
+					{% if day and not is_saved %}
+						<form method="post" action="/seating">
+							<input type="hidden" name="classroom_id"
+										 value="{{ classroom.key.urlsafe() }}">
+							<input type="hidden" name="keystring">
+							<input type="hidden" name="day" value="{{ day }}">
+							<!-- table_size value gets reset on table-size-select change -->
+							<input type="hidden" name="table_size"
+										 value="{{default_table_size}}">
+							<button id="save"
+										  class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--primary">
+									Save this Arrangement: Day {{ day }}
+							</button>
+						</form>
+					{% endif %}
+				</div>
+			{% else %}
+				<div class="error">
+					Error: Class has no students. Please add students.
+				</div>
+			{% endif %}
+		</div>
+	</section>
+	<script src='/resources/scripts/dragula.min.js'></script>
+	<script src='/resources/scripts/seating.js'></script>
+	<script>
+		document.addEventListener('DOMContentLoaded', main, false);
+	</script>
+</div>

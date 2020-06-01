@@ -1,0 +1,30 @@
+/* Styling specific for seating.html */
+.page-content {
+	padding: 0 48px;
+}
+
+.seating-main {
+	display: flex;
+	overflow: scroll;
+}
+
+.classroom-name {
+	margin-bottom: 0;
+}
+
+.classroom-options > a {
+	display: block;
+	text-align: left;
+}
+
+.seating {
+	display: flex;
+	margin-top: 48px;
+}
+
+.error {
+	border: 2px solid red;
+	padding: 8px;
+	margin: 0 50px;
+	height: fit-content;
+}

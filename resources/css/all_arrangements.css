@@ -1,0 +1,27 @@
+/* Styling specific for all_arrangements.html */
+.page-content {
+	padding: 0 48px;
+}
+
+h1 {
+	margin-bottom: 0;
+}
+
+.all-arrangements {
+	display: flex;
+	flex-wrap: wrap;
+}
+
+.all-arrangements > * {
+	width: 40%;
+	margin-right: 50px;
+}
+
+.arrangement-metadata {
+	display: flex;
+	align-items: baseline;
+}
+
+.spacer {
+	flex-grow: 1;
+}
